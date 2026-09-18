@@ -8,7 +8,7 @@
 # slowapi
 
 
-mcp
+mcp<2
 fastapi
 uvicorn
 pypdf
