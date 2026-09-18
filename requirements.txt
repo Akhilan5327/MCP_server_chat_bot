@@ -1,8 +1,18 @@
+# mcp
+# fastapi
+# uvicorn
+# pypdf
+# anthropic
+# python-multipart
+# groq
+# slowapi
+
+
 mcp
 fastapi
 uvicorn
 pypdf
-anthropic
 python-multipart
+python-dotenv
 groq
 slowapi
