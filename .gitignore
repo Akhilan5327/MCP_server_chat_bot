@@ -1,0 +1,17 @@
+# Virtual environment - huge, and everyone should create their own
+.venv/
+
+# Secrets - NEVER commit your real API key
+.env
+
+# Python cache files - regenerated automatically, no need to track
+__pycache__/
+*.pyc
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE settings (optional, remove if you want to share these)
+.vscode/
+.idea/

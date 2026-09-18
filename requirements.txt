@@ -1,0 +1,8 @@
+mcp
+fastapi
+uvicorn
+pypdf
+anthropic
+python-multipart
+groq
+slowapi
