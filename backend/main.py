@@ -4,8 +4,7 @@ FastAPI backend for the Xerox Shop Assistant.
 Run with:
     uvicorn main:app --reload --port 8000
 
-Requires ANTHROPIC_API_KEY set in the environment, e.g.:
-    export ANTHROPIC_API_KEY=sk-ant-...
+Requires GROQ_API_KEY set in the environment (see .env.example).
 """
 from dotenv import load_dotenv
 load_dotenv()
@@ -18,29 +17,24 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 
+import json
+import os
+import re
+import tempfile
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+
+from fastapi import FastAPI, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, Request
-from pydantic import BaseModel
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-import json
-import os
-from fastapi.responses import FileResponse
-import tempfile
-from fastapi import UploadFile, File, Form
-from pydantic import Field
+
 from agent import ShopAgent
+
 FRONTEND_PATH = os.path.join(os.path.dirname(__file__), "..", "frontend", "index.html")
 
-@app.get("/")
-async def serve_frontend():
-    return FileResponse(FRONTEND_PATH)
-
-# In-memory session store: {session_id: [message history]}
-# Deliberately not persisted to DB — conversation memory is short-lived only.
 SESSIONS: dict[str, list] = {}
 
 agent = ShopAgent()
@@ -54,11 +48,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Xerox Shop Assistant", lifespan=lifespan)
+
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Allow the React dev server to call this API. Tighten this before production.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -66,6 +60,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+AADHAR_PATTERN = re.compile(r'\b\d{4}\s?\d{4}\s?\d{4}\b')
+PAN_PATTERN = re.compile(r'\b[A-Z]{5}\d{4}[A-Z]\b')
+
+
+def redact_pii(text: str) -> str:
+    text = AADHAR_PATTERN.sub('[ID number removed]', text)
+    text = PAN_PATTERN.sub('[ID number removed]', text)
+    return text
 
 
 class ChatRequest(BaseModel):
@@ -77,12 +80,10 @@ class ChatResponse(BaseModel):
     reply: str
 
 
-# @app.post("/chat", response_model=ChatResponse)
-# async def chat(req: ChatRequest):
-#     history = SESSIONS.get(req.session_id, [])
-#     reply_text, updated_history = await agent.chat(req.message, history)
-#     SESSIONS[req.session_id] = updated_history
-#     return ChatResponse(reply=reply_text)
+@app.get("/")
+async def serve_frontend():
+    return FileResponse(FRONTEND_PATH)
+
 
 @app.post("/chat", response_model=ChatResponse)
 @limiter.limit("10/minute")
@@ -91,15 +92,17 @@ async def chat(request: Request, req: ChatRequest):
     try:
         reply_text, updated_history = await agent.chat(req.message, history)
         SESSIONS[req.session_id] = updated_history
-        return ChatResponse(reply=reply_text)
+        return ChatResponse(reply=redact_pii(reply_text))
     except Exception as e:
         logging.getLogger("main").error("Chat failed: %s", e)
         return ChatResponse(
             reply="Sorry, I'm having trouble right now. Please call or visit the shop directly for help."
         )
 
+
 MAX_PDF_SIZE_MB = 20
 MAX_PDF_SIZE_BYTES = MAX_PDF_SIZE_MB * 1024 * 1024
+
 
 @app.post("/upload-quote")
 @limiter.limit("10/minute")
@@ -151,7 +154,3 @@ async def upload_quote(
 @app.get("/health")
 async def health():
     return {"status": "ok", "tools_loaded": agent.tool_count}
-
-@app.get("/test-rupee")
-async def test_rupee():
-    return {"message": "₹100"}
