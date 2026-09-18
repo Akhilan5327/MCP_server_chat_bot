@@ -237,26 +237,6 @@
   .composer button#sendBtn:hover:not(:disabled) { background: var(--ink-blue-dark); }
   .composer button#sendBtn:disabled { opacity: 0.45; cursor: default; }
 
-  .settings {
-    padding: 8px 14px 14px;
-    font-size: 12px;
-    color: var(--ink-muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .settings input {
-    flex: 1;
-    font-family: inherit;
-    font-size: 12px;
-    color: var(--ink-muted);
-    background: transparent;
-    border: none;
-    outline: none;
-    border-bottom: 1px dashed var(--border);
-    padding: 2px 0;
-  }
-
   .messages::-webkit-scrollbar { width: 8px; }
   .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
 </style>
@@ -299,18 +279,26 @@
     <input type="text" id="input" placeholder="Ask something…" autocomplete="off" />
     <button id="sendBtn">Send</button>
   </div>
-  <div class="settings">
-    Server:
-    <input type="text" id="apiBase" value="http://localhost:8000" spellcheck="false" />
-  </div>
 </div>
 
 <script>
+  // Fixed API base: this page is always served by the same backend it talks
+  // to (FastAPI serves this file directly via GET /), so the API lives at
+  // the same origin the page was loaded from. No user-editable field needed
+  // or wanted here - mistyping it would silently break the chat with no
+  // clear explanation, so it's simpler and safer to just derive it.
+  //
+  // Exception: opening this file directly from disk (file://) for local
+  // testing, where there's no "origin" to derive from - falls back to the
+  // local dev server address in that case.
+  const API_BASE = (location.protocol === 'file:')
+    ? 'http://localhost:8000'
+    : location.origin;
+
   const messagesEl = document.getElementById('messages');
   const emptyState = document.getElementById('emptyState');
   const inputEl = document.getElementById('input');
   const sendBtn = document.getElementById('sendBtn');
-  const apiBaseEl = document.getElementById('apiBase');
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
 
@@ -326,10 +314,6 @@
 
   const sessionId = 'ui-' + Math.random().toString(36).slice(2, 10);
   let busy = false;
-
-  function apiBase() {
-    return apiBaseEl.value.trim().replace(/\/$/, '');
-  }
 
   function addMessage(role, text) {
     if (emptyState) emptyState.remove();
@@ -370,14 +354,14 @@
 
   async function checkHealth() {
     try {
-      const res = await fetch(apiBase() + '/health');
+      const res = await fetch(API_BASE + '/health');
       if (!res.ok) throw new Error();
       const data = await res.json();
       statusDot.className = 'dot';
       statusText.textContent = data.tools_loaded + ' tools ready';
     } catch {
       statusDot.className = 'dot off';
-      statusText.textContent = 'Offline — check the server';
+      statusText.textContent = 'Offline — try again shortly';
     }
   }
 
@@ -391,7 +375,7 @@
     addTyping();
 
     try {
-      const res = await fetch(apiBase() + '/chat', {
+      const res = await fetch(API_BASE + '/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, session_id: sessionId }),
@@ -402,7 +386,7 @@
       addMessage('assistant', data.reply || '(empty reply)');
     } catch (err) {
       removeTyping();
-      addMessage('error', "Couldn't reach the shop assistant server. Make sure the backend is running at " + apiBase() + ".");
+      addMessage('error', "Couldn't reach the shop assistant. Please try again in a moment.");
     } finally {
       busy = false;
       sendBtn.disabled = false;
@@ -414,7 +398,6 @@
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendMessage();
   });
-  apiBaseEl.addEventListener('change', checkHealth);
 
   attachBtn.addEventListener('click', () => {
     quotePanel.style.display = quotePanel.style.display === 'none' ? 'flex' : 'none';
@@ -440,6 +423,7 @@
       addMessage('error', `That file is ${(chosenFile.size / (1024*1024)).toFixed(1)} MB — please upload a PDF under ${MAX_SIZE_MB} MB.`);
       return;
     }
+
     const formData = new FormData();
     formData.append('file', chosenFile);
     formData.append('service_name', qService.value);
@@ -452,7 +436,7 @@
     addTyping();
 
     try {
-      const res = await fetch(apiBase() + '/upload-quote', { method: 'POST', body: formData });
+      const res = await fetch(API_BASE + '/upload-quote', { method: 'POST', body: formData });
       removeTyping();
       if (!res.ok) throw new Error('Server returned ' + res.status);
       const data = await res.json();
@@ -474,15 +458,9 @@
     } finally {
       busy = false;
       qSubmit.disabled = false;
-      // Deliberately keep the file selected and panel open, so the user
-      // can change color/copies and re-quote the same PDF without
-      // re-uploading. Use the "X" button to clear it.
     }
   });
 
-  if (location.protocol !== 'file:') {
-    apiBaseEl.value = location.origin;
-  }
   checkHealth();
   inputEl.focus();
 </script>
