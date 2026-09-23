@@ -8,8 +8,10 @@ Every function in this file only ever SELECTs — no INSERT/UPDATE/DELETE.
 import sqlite3
 import os
 import datetime
+from zoneinfo import ZoneInfo
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "shop.db")
+INDIA_TZ = ZoneInfo("Asia/Kolkata")
 
 
 def _connect():
@@ -69,16 +71,38 @@ def get_shop_hours(day: str = None):
 
 
 def is_open_now():
-    """Convenience check: is the shop open right at this moment?"""
-    now = datetime.datetime.now()
+    """Check whether the shop is open using the current Asia/Kolkata time."""
+
+    now = datetime.datetime.now(INDIA_TZ)
+
     hours = get_shop_hours("today")
+
     if hours["is_closed"]:
-        return {"open_now": False, "reason": hours.get("reason", "Closed today")}
+        return {
+            "open_now": False,
+            "reason": hours.get("reason", "Closed today"),
+            "current_time": now.strftime("%H:%M"),
+            "timezone": "Asia/Kolkata",
+        }
 
     current_time = now.strftime("%H:%M")
-    if hours["open_time"] <= current_time <= hours["close_time"]:
-        return {"open_now": True, "closes_at": hours["close_time"]}
-    return {"open_now": False, "opens_at": hours["open_time"], "closes_at": hours["close_time"]}
+
+    if hours["open_time"] <= current_time < hours["close_time"]:
+        return {
+            "open_now": True,
+            "current_time": current_time,
+            "opens_at": hours["open_time"],
+            "closes_at": hours["close_time"],
+            "timezone": "Asia/Kolkata",
+        }
+
+    return {
+        "open_now": False,
+        "current_time": current_time,
+        "opens_at": hours["open_time"],
+        "closes_at": hours["close_time"],
+        "timezone": "Asia/Kolkata",
+    }
 
 
 def get_print_price(service_name: str, color_mode: str, paper_size: str = "A4"):
@@ -227,7 +251,7 @@ def get_faq_info(query: str):
 
 
 def _resolve_date(day: str = None) -> datetime.date:
-    today = datetime.date.today()
+    today = datetime.datetime.now(INDIA_TZ).date()
     if not day or day.lower() == "today":
         return today
     if day.lower() == "tomorrow":
