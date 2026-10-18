@@ -14,7 +14,7 @@ DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "databa
 
 def normalize(text: str) -> str:
     """'Pan card NEW price?' and 'pan card new price' become the same key."""
-    t = re.sub(r"[^\w\s]", " ", text.lower())
+    t = re.sub(r"[^\w\s\u0b80-\u0bff]", " ", text.lower())
     return " ".join(t.split())
 
 

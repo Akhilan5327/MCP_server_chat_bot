@@ -1,92 +1,176 @@
-# AI-Powered Xerox Shop Assistant — Phase 1 (Read-Only MVP)
+# Anbhu Enterprises Shop Assistant
 
-A read-only Q&A + pricing-quote assistant for a printing shop. No orders are
-created and no data is written by the AI agent — every tool only reads from
-SQLite and does arithmetic.
+An AI chat assistant for a printing, Xerox and e-sevai shop in Pallavaram, Chennai. Customers ask about prices, services, opening hours and the shop address. The assistant answers from the shop's own database and **never makes up a price**.
 
-## Structure
+> **Live demo:** `https://mcp-server-chat-bot.onrender.com/`
 
-```
-xerox_shop_assistant/
-├── database/
-│   ├── schema.sql       # table definitions (services, pricing, hours, faq, etc.)
-│   ├── seed_data.py     # creates shop.db and fills it with sample data
-│   ├── db.py            # read-only query functions (plain sqlite3, no ORM)
-│   └── shop.db          # created after running seed_data.py (gitignore this if it has real data)
-├── mcp_server/
-│   └── server.py        # MCP server exposing tools to the LLM agent
-├── requirements.txt
-└── README.md
-```
+## What it does
 
-## Setup (on your own machine — this sandbox has no internet access)
+- Answers price questions for fixed-fee services (PAN card, Aadhar correction, passport, voter ID, smart card, online certificates and more).
+- Gives a per-page quote for printing and photocopying, including bulk discounts and add-ons such as binding.
+- Tells the customer to contact or visit the shop for services that have no fixed price (about 28 services such as LLR, driving licence, ticket booking).
+- Tells the customer whether the shop is open now, tomorrow, or on any date, with holidays handled.
+- Gives the shop address and phone number from the database.
+- Counts the pages of an uploaded PDF and quotes the printing price.
 
-```bash
-cd xerox_shop_assistant
-python3 -m venv venv
-source venv/bin/activate          # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+## Architecture
 
-# Create and seed the database (only needs to run once)
-cd database
-python3 seed_data.py
-cd ..
-
-# Run the MCP server
-cd mcp_server
-python3 server.py
+```mermaid
+flowchart LR
+    C[Customer<br/>chat page] --> F[FastAPI backend<br/>rate limit, PII redaction]
+    F --> K{Answer<br/>cache}
+    K -- hit --> C
+    K -- miss --> A[Agent loop]
+    A --> R[Model router<br/>3 models, failover]
+    R --> G[Groq LLM]
+    A --> M[MCP client]
+    M --> S[MCP server<br/>read-only tools]
+    S --> D[(SQLite<br/>shop.db)]
+    A --> P{Price guard}
+    P -- checked reply --> C
 ```
 
-## Editing shop data
+The language model never touches the database. It can only call a small set of **read-only tools** exposed by an MCP server, and every price it states must come from a tool result.
 
-There's no admin write-tool yet (by design — this MVP is read-only). To
-update prices, hours, or FAQs:
-1. Delete `database/shop.db`
-2. Edit the sample data in `database/seed_data.py`
-3. Re-run `python3 seed_data.py`
+## Safety and reliability features
 
-For anything past the MVP stage, open `shop.db` directly with a free tool
-like **DB Browser for SQLite** (https://sqlitebrowser.org) to edit rows
-without touching seed_data.py at all.
-
-## Tools exposed by the MCP server
-
-| Tool | Purpose |
+| Feature | What it does |
 |---|---|
-| `get_services()` | List all services offered |
-| `get_shop_hours(day)` | Open/close time for a given day ('today', 'tomorrow', weekday name, or ISO date) |
-| `is_shop_open_now()` | Is the shop open right this moment |
-| `get_print_price(service_name, color_mode, paper_size)` | Per-page price lookup |
-| `calculate_order_price(service_name, pages, color_mode, paper_size, copies, add_on_names)` | Full itemized quote with bulk discount + add-ons |
-| `get_faq_info(query)` | Keyword search over shop policy/FAQ info |
-| `count_pdf_pages(file_path)` | Count pages in an uploaded PDF, for auto-quoting |
+| **Read-only database** | The app never writes to SQLite. A test checks that every SQL statement in the code is a `SELECT`. |
+| **Price guard** (`backend/guards.py`) | Every amount in a reply (INR, Rs, rupee sign) must appear in a tool result from the same conversation. Otherwise the reply is replaced with "Sorry, I could not confirm that price. Please contact or visit the shop for the exact charge." |
+| **Model fallback** (`backend/llm_router.py`) | An ordered list of models. If one is rate-limited or fails, the next one answers in about a second. A failing model is skipped for a cool-down period. Hard questions go to the larger model first. |
+| **Answer cache** (`backend/cache.py`) | Repeated first questions are answered from memory with no model call. The cache clears itself when `shop.db` changes, entries expire after 2 hours, and answers that depend on the time (open now, hours) or that failed are never cached. |
+| **Forgiving name matching** | "pancard", "aadhaar", "voterid", "tirupathi dharshan" and similar spellings still find the right service. |
+| **PII redaction** | Aadhar and PAN numbers in replies are removed. The bot never asks for a full ID number. |
+| **Rate limiting** | 10 requests per minute per visitor, using the real visitor address behind Render's proxy. |
+| **Scope control** | Declines general-knowledge, coding and similar questions, and does not reveal its instructions. |
 
-## Verified working (tested in dev sandbox with plain sqlite3)
+## Evaluation
 
-- Seeding the DB and querying services, hours, pricing, FAQ — all confirmed working.
-- Example quote calculation (60 B/W pages + spiral binding) correctly applies
-  the 5% bulk discount tier and adds the binding cost.
+The project has a measured test harness, not just a demo. `tests/eval_chat.py` sends real questions to the running bot and checks each reply with keyword rules: the right price must appear, forbidden things (such as a price for a contact-only service, or a leaked system prompt) must not. Backend errors are counted separately from wrong answers. Every run is saved to `tests/eval_history.csv`, and `tests/plot_eval.py` draws the progress chart.
 
-## What's intentionally NOT here yet
+![Eval progress](tests/eval_progress.png)
 
-- `create_order()`, `get_order_status()`, `upload_document()` (persistent) — these
-  need write access, out of scope for this read-only MVP.
-- FastAPI HTTP layer connecting a chat UI to this MCP server — next step.
-- React chat widget — next step.
-- Admin dashboard — deferred; edit `shop.db` directly for now (see above).
+| Run | Change | Score |
+|---|---|---|
+| baseline v2 | first stable version | 49/55 (89.1%) |
+| baseline v3 | prompt tuning | 47/55 (85.5%) |
+| model fallback | three-model chain | 50/55 (90.9%) |
+| price guard | amounts checked against tool results | 47/55 (85.5%) |
+| english only | shorter prompt, cache, English-only replies | 51/60   85.0%|
 
-## Next steps
+Notes on reading the scores: the questions are answered by a live model, so a run can vary by about 5 points. The question set grew over time, so compare runs by category as well as by total. Tamil-script questions are skipped with `--english-only`, because the bot currently replies in English.
 
-1. Wire this MCP server up as a tool source for an LLM agent (e.g. via the
-   Claude API with MCP client support, or the `mcp` Python client library).
-2. Build a minimal FastAPI endpoint that takes a customer chat message,
-   calls the LLM (with these tools available), and returns the reply.
-3. Build the React chat widget to talk to that FastAPI endpoint.
-4. For the "I want to print this PDF" flow: accept the file upload in
-   FastAPI, save it to a temp path, call `count_pdf_pages()`, then
-   `calculate_order_price()` — and discard the temp file afterward if you
-   want to stay fully write-free.
+Other measurements:
 
+- **Prompt size:** about 2,200 tokens per call before optimisation, about 1,390 after (shorter prompt, shorter tool descriptions, unused tool hidden from the model).
+- **Automated tests:** 78 tests (`python -m pytest tests -v`) covering prices, name matching, contact-only services, print quote maths, bulk discounts, opening hours and holidays, the read-only check, the price guard, the model router and the cache.
+- **Load test:** 10 simultaneous users, `<fill in: success rate, median and slowest reply time from python tests\load_test.py --users 10>`.
+
+## Tech stack
+
+Python, FastAPI, SQLite, MCP (FastMCP, streamable HTTP), Groq (OpenAI-compatible tool calling), slowapi, pytest, plain HTML/JS frontend, Render for hosting.
+
+## Project structure
+
+```
+backend/
+  main.py          FastAPI app: /chat, /upload-quote, /health, rate limit, PII redaction
+  agent.py         system prompt, agent loop, tool calling, cache and guard hooks
+  llm_router.py    model chains, failover, cool-down
+  guards.py        price guard
+  cache.py         answer cache
+mcp_server/
+  server.py        read-only tools exposed over MCP
+database/
+  schema.sql       tables
+  seed_data.py     services, prices, hours, holidays, FAQs, shop address and phone
+  db.py            all SQL, name matching, price logic
+  shop.db          the generated SQLite database
+frontend/
+  index.html       chat page
+tests/
+  test_db.py, test_guard_router.py, test_cache.py   automated tests
+  eval_chat.py, plot_eval.py                        evaluation harness and chart
+  load_test.py                                      concurrent-user test
+  eval_history.csv, eval_progress.png               recorded results
+```
+
+## Run it locally (Windows PowerShell)
+
+1. Create the environment and install packages:
+   ```powershell
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
+2. Get a free API key from [console.groq.com](https://console.groq.com) and put it in `backend/.env`:
+   ```
+   GROQ_API_KEY=your_key_here
+   ```
+   This file is ignored by git. Never commit it.
+3. Edit the shop details at the top of `database/seed_data.py` (`SHOP_ADDRESS`, `SHOP_PHONE`, and so on), then build the database:
+   ```powershell
+   cd database
+   Remove-Item shop.db -ErrorAction SilentlyContinue
+   python seed_data.py
+   cd ..
+   ```
+4. Start the two servers, **MCP server first**, each in its own window:
+   ```powershell
+   python mcp_server\server.py
+   ```
+   ```powershell
+   cd backend
+   uvicorn main:app --reload --port 8000
+   ```
+5. Open `http://127.0.0.1:8000`.
+
+## Run the tests
+
+```powershell
+python -m pytest tests -v
+```
+
+To score the live bot, start the backend with the cache switched off so repeated questions are really answered by the model:
+
+```powershell
+cd backend
+$env:ANSWER_CACHE="off"
+uvicorn main:app --port 8000
+```
+
+Then, from another window:
+
+```powershell
+python tests\eval_chat.py --english-only --label "my change" --pause 10
+python tests\plot_eval.py
+python tests\load_test.py --users 10
+```
+
+## Change prices and services
+
+All data lives in `database/seed_data.py`. A service with rows in `service_pricing` has fixed prices. A service without any is answered with "contact or visit the shop". Per-page services use the `pricing` table. After editing, rebuild `shop.db` as in step 3 above and restart the servers. The answer cache clears by itself when the database file changes.
+
+## Deploy on Render
+
+`start.sh` starts both the MCP server and the backend. Set `GROQ_API_KEY` as an environment variable in the Render dashboard. `database/shop.db` is part of the repository, so commit it after rebuilding. The free tier sleeps after about 15 minutes without traffic, so a free uptime pinger on `/health` keeps it awake.
+
+## Known limitations
+
+- Replies are in English only. Tamil and Tanglish questions are understood but answered in English.
+- Chat history is kept in memory and is lost when the server restarts.
+- CORS is currently open (`*`) and should be restricted to the shop's website before wider use.
+- The Groq free tier has per-minute token limits. The cache and the fallback chain reduce the effect, but a sudden crowd can still be slowed down.
+- The rate limit trusts the visitor address sent by the proxy, so a determined person could get around it.
+
+## Possible next steps
+
+Restrict CORS, add Cloudflare Turnstile, add a "documents to bring" FAQ for each service, add a daily summary of unanswered questions for the shop owner, and add CI that runs the tests on every push.
+
+## License
+
+MIT. See the [LICENSE](LICENSE) file.
 
 
 

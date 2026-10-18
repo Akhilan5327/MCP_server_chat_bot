@@ -1,48 +1,65 @@
 """
-Draws the score history from tests/eval_history.csv into tests/eval_progress.png.
-  pip install matplotlib
+Draw the eval progress chart from tests/eval_history.csv
+
   python tests/plot_eval.py
-Without matplotlib it prints a text table instead.
 """
 import csv
 import os
 
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt  # noqa: E402
+
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "eval_history.csv")
-OUT = os.path.join(HERE, "eval_progress.png")
+CSV_PATH = os.path.join(HERE, "eval_history.csv")
+PNG_PATH = os.path.join(HERE, "eval_progress.png")
+MIN_QUESTIONS = 30  # ignore small debugging runs
+
+
+def load():
+    rows = []
+    with open(CSV_PATH, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            try:
+                total = int(r["total"])
+                passed = int(r["passed"])
+                pct = float(r["percent"])
+            except (TypeError, ValueError, KeyError):
+                continue
+            if total < MIN_QUESTIONS:
+                continue
+            rows.append({"time": r["time"], "label": r["label"], "passed": passed, "total": total, "pct": pct})
+    return rows
 
 
 def main():
-    if not os.path.exists(SRC):
-        print("No history yet. Run: python tests/eval_chat.py --label baseline")
-        return
-    rows = list(csv.DictReader(open(SRC, encoding="utf-8")))
-    print(f"{'#':>2}  {'time':<16} {'score':>6}  label")
-    for i, r in enumerate(rows, 1):
-        print(f"{i:>2}  {r['time']:<16} {r['percent']:>5}%  {r['label']}")
-    try:
-        import matplotlib
-        matplotlib.use("Agg")
-        import matplotlib.pyplot as plt
-    except ImportError:
-        print("\n(install matplotlib to also get a chart: pip install matplotlib)")
+    rows = load()
+    if not rows:
+        print("No full runs found in eval_history.csv")
         return
 
-    xs = list(range(1, len(rows) + 1))
-    ys = [float(r["percent"]) for r in rows]
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    ax.plot(xs, ys, marker="o", linewidth=2, color="#1f77b4")
-    for x, y, r in zip(xs, ys, rows):
-        ax.annotate(f"{y:g}%", (x, y), textcoords="offset points", xytext=(0, 8), ha="center")
+    print(f"{'time':<17} {'label':<28} {'score':>9}")
+    for r in rows:
+        print(f"{r['time']:<17} {r['label'][:28]:<28} {r['passed']:>3}/{r['total']:<3} {r['pct']:>5.1f}%")
+
+    labels = [r["label"] for r in rows]
+    values = [r["pct"] for r in rows]
+    xs = list(range(len(rows)))
+
+    fig, ax = plt.subplots(figsize=(9, 4.5))
+    ax.plot(xs, values, marker="o", linewidth=2)
+    for x, v in zip(xs, values):
+        ax.annotate(f"{v:.1f}%", (x, v), textcoords="offset points", xytext=(0, 9), ha="center")
     ax.set_xticks(xs)
-    ax.set_xticklabels([r["label"] for r in rows], rotation=25, ha="right")
+    ax.set_xticklabels(labels, rotation=20, ha="right")
     ax.set_ylim(0, 105)
-    ax.set_ylabel("Questions passed (%)")
-    ax.set_title("Shop assistant evaluation score over time")
-    ax.grid(axis="y", alpha=0.3)
+    ax.set_ylabel("Questions answered correctly (%)")
+    ax.set_title("Evaluation score by run")
+    ax.grid(alpha=0.3)
     fig.tight_layout()
-    fig.savefig(OUT, dpi=150)
-    print(f"\nChart saved to {OUT}")
+    fig.savefig(PNG_PATH, dpi=150)
+    print(f"Saved {PNG_PATH}")
 
 
 if __name__ == "__main__":
