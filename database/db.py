@@ -5,6 +5,7 @@ Deliberately uses plain sqlite3 (stdlib, no install needed) rather than
 an ORM, since the scope here is a handful of simple read queries.
 Every function in this file only ever SELECTs — no INSERT/UPDATE/DELETE.
 """
+import re
 import sqlite3
 import os
 import datetime
@@ -12,6 +13,16 @@ from zoneinfo import ZoneInfo
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "shop.db")
 INDIA_TZ = ZoneInfo("Asia/Kolkata")
+
+CONTACT_MESSAGE = (
+    "The shop does offer this service, but there is no fixed price because it "
+    "depends on the case. Tell the customer to contact or visit the shop for "
+    "more information. Do not mention any price."
+)
+NOT_LISTED_MESSAGE = (
+    "This service is not in the shop's list. Tell the customer you do not have "
+    "it listed and ask them to contact or visit the shop to check."
+)
 
 
 def _connect():
@@ -122,50 +133,149 @@ def get_print_price(service_name: str, color_mode: str, paper_size: str = "A4"):
     finally:
         conn.close()
 
-def get_service_price(service_name: str, service_option: str):
-    """Look up the fixed price for a non-printing service."""
-    conn = _connect()
-    try:
-        row = conn.execute(
-            """SELECT s.name, sp.service_option, sp.price
-               FROM service_pricing sp
-               JOIN services s ON s.id = sp.service_id
-               WHERE LOWER(s.name) = LOWER(?)
-                 AND LOWER(sp.service_option) = LOWER(?)""",
-            (service_name, service_option),
-        ).fetchone()
+_ALIASES = {
+    "aadhaar": "aadhar", "adhaar": "aadhar", "licence": "license",
+    "tirupathi": "tirupati", "dharshan": "darshan",
+    "sabarimalai": "sabarimala", "sabarilmalai": "sabarimala",
+    "pancard": "pan card", "voterid": "voter id", "smartcard": "smart card",
+    "aadharcard": "aadhar card",
+}
 
-        if not row:
-            return {
-                "found": False,
-                "message": f"No pricing found for {service_name} / {service_option}",
-            }
 
-        return {
-            "found": True,
-            "service": row["name"],
-            "option": row["service_option"],
-            "price": row["price"],
-        }
-    finally:
-        conn.close()
+_GENERIC_WORDS = {
+    "new", "apply", "application", "correction", "change", "update", "edit",
+    "name", "address", "mobile", "phone", "number", "renewal", "renew",
+    "fee", "price", "cost", "charge", "for", "the", "a", "of", "to", "my",
+    "how", "much", "what", "is", "in",
+}
+# words that point to an option of a fixed-price service
+_OPTION_HINTS = {
+    "correction": {"change", "update", "edit", "name", "address", "mobile", "phone", "number", "correct", "fix"},
+    "new application": {"new", "apply", "fresh"},
+}
+
+
+def _with_contact(conn, message: str) -> str:
+    """Add the shop's contact details (from the FAQ table) to a 'contact the shop' message."""
+    row = conn.execute("SELECT answer FROM faq WHERE category = 'contact' LIMIT 1").fetchone()
+    return f"{message} Shop contact: {row['answer']}" if row else message
+
+
+def _norm(text: str) -> str:
+    """Lowercase, fix common spellings, drop punctuation."""
+    text = (text or "").lower()
+    for wrong, right in _ALIASES.items():
+        text = text.replace(wrong, right)
+    return " ".join(re.sub(r"[^a-z0-9 ]+", " ", text).split())
+
+
+def _find_services(conn, query: str):
+    """Forgiving lookup; if one name just extends another, prefer the shorter."""
+    hits = _find_services_raw(conn, query)
+    if len(hits) > 1:
+        names = {h['id']: _norm(h['name']) for h in hits}
+        keep = [h for h in hits if not any(
+            o != h['id'] and names[h['id']].startswith(names[o] + ' ') for o in names)]
+        hits = keep or hits
+    return hits
+
+
+def _find_services_raw(conn, query: str):
+    q = _norm(query)
+    if len(q) < 2:
+        return []
+    rows = conn.execute("SELECT id, name, description FROM services").fetchall()
+    named = [(r, _norm(r["name"])) for r in rows]
+
+    # 1. exact name
+    hit = [r for r, n in named if n == q]
+    if hit:
+        return hit
+    # 2. query inside name
+    hit = [r for r, n in named if q in n]
+    if hit:
+        return hit
+    # 3. name inside query (longest name wins)
+    hit = [(r, n) for r, n in named if len(n) >= 4 and n in q]
+    if hit:
+        best = max(len(n) for _, n in hit)
+        return [r for r, n in hit if len(n) == best]
+    # 3b. drop generic words (correction, new, ...) and retry on what is left
+    rest = " ".join(w for w in q.split() if w not in _GENERIC_WORDS)
+    if rest and rest != q:
+        found = _find_services_raw(conn, rest)
+        if found:
+            return found
+    # 4. query matches a fixed-price option name
+    opt = conn.execute(
+        """SELECT DISTINCT s.id, s.name, s.description FROM service_pricing sp
+           JOIN services s ON s.id = sp.service_id"""
+    ).fetchall()
+    opts = conn.execute("SELECT service_id, service_option FROM service_pricing").fetchall()
+    ids = {o["service_id"] for o in opts if _norm(o["service_option"]) and _norm(o["service_option"]) in q or q in _norm(o["service_option"])}
+    hit = [r for r in opt if r["id"] in ids]
+    if hit:
+        return hit
+    # 5. every word appears in name + description
+    words = q.split()
+    return [r for r in rows if all(w in _norm(r["name"] + " " + (r["description"] or "")) for w in words)]
+
+
+def _describe_service(conn, service):
+    rows = conn.execute(
+        "SELECT service_option, price FROM service_pricing WHERE service_id = ? ORDER BY id",
+        (service["id"],),
+    ).fetchall()
+    if rows:
+        return {"service": service["name"], "fixed_price": True,
+                "options": [dict(r) for r in rows]}
+    per_page = conn.execute(
+        "SELECT 1 FROM pricing WHERE service_id = ? LIMIT 1", (service["id"],)
+    ).fetchone()
+    if per_page:
+        return {"service": service["name"], "fixed_price": False,
+                "message": "This service is priced per page. Use calculate_order_price."}
+    return {"service": service["name"], "fixed_price": False,
+            "message": _with_contact(conn, CONTACT_MESSAGE)}
+
 
 def get_service_options(service_name: str):
-    """List all valid pricing options and prices for a fixed-fee service."""
+    """Look up how any shop service is priced (fixed price, per page, or contact the shop)."""
     conn = _connect()
     try:
-        rows = conn.execute(
-            """SELECT sp.service_option, sp.price
-               FROM service_pricing sp
-               JOIN services s ON s.id = sp.service_id
-               WHERE LOWER(s.name) = LOWER(?)""",
-            (service_name,),
-        ).fetchall()
-        if not rows:
-            return {"found": False, "message": f"No service options found for {service_name}"}
-        return {"found": True, "service": service_name, "options": [dict(r) for r in rows]}
+        matches = _find_services(conn, service_name)
+        if not matches:
+            return {"found": False, "message": _with_contact(conn, NOT_LISTED_MESSAGE)}
+        if len(matches) == 1:
+            return {"found": True, **_describe_service(conn, matches[0])}
+        return {"found": True, "multiple_matches": True,
+                "services": [_describe_service(conn, m) for m in matches]}
     finally:
         conn.close()
+
+
+def get_service_price(service_name: str, service_option: str):
+    """Look up the fixed price for one option of a service."""
+    info = get_service_options(service_name)
+    if not info.get("found") or info.get("multiple_matches") or not info.get("fixed_price"):
+        return info
+    want = _norm(service_option)
+    opts = info["options"]
+    pick = [o for o in opts if _norm(o["service_option"]) == want] or \
+           [o for o in opts if want and (want in _norm(o["service_option"]) or _norm(o["service_option"]) in want)]
+    if not pick:
+        words = set(want.split())
+        for o in opts:
+            hints = _OPTION_HINTS.get(_norm(o["service_option"]), set())
+            if words & hints:
+                pick.append(o)
+    if len(pick) == 1:
+        return {"found": True, "service": info["service"],
+                "option": pick[0]["service_option"], "price": pick[0]["price"]}
+    return {"found": False,
+            "message": f"No price listed for {info['service']} / {service_option}. "
+                       "Tell the customer to contact or visit the shop.",
+            "options": opts}
 
 
 def calculate_order_price(
@@ -235,8 +345,18 @@ def calculate_order_price(
         conn.close()
 
 
+_FAQ_STOP = {"the", "what", "how", "can", "you", "your", "shop", "is", "are", "for", "and",
+             "does", "do", "give", "tell", "please", "any", "has", "have", "with", "about"}
+_FAQ_SYNONYMS = {
+    "address": "location", "where": "location", "map": "location", "maps": "location",
+    "directions": "location", "located": "location", "landmark": "location",
+    "phone": "contact", "mobile": "contact", "number": "contact", "call": "contact",
+    "whatsapp": "contact", "reach": "contact",
+}
+
+
 def get_faq_info(query: str):
-    """Simple keyword search over the FAQ table (no fuzzy matching — keep MVP simple)."""
+    """FAQ search. Tries the whole phrase first, then falls back to the best word matches."""
     conn = _connect()
     try:
         like = f"%{query}%"
@@ -245,7 +365,25 @@ def get_faq_info(query: str):
                WHERE question LIKE ? OR answer LIKE ? OR category LIKE ?""",
             (like, like, like),
         ).fetchall()
-        return [dict(r) for r in rows]
+        if rows:
+            return [dict(r) for r in rows]
+
+        words = set()
+        for w in re.findall(r"[a-z0-9]+", (query or "").lower()):
+            if len(w) >= 3 and w not in _FAQ_STOP:
+                words.add(w)
+                if w in _FAQ_SYNONYMS:
+                    words.add(_FAQ_SYNONYMS[w])
+        if not words:
+            return []
+        scored = []
+        for r in conn.execute("SELECT question, answer, category FROM faq").fetchall():
+            text = f"{r['question']} {r['answer']} {r['category']}".lower()
+            score = sum(1 for w in words if w in text)
+            if score:
+                scored.append((score, dict(r)))
+        scored.sort(key=lambda x: -x[0])
+        return [r for _, r in scored[:5]]
     finally:
         conn.close()
 

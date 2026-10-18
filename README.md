@@ -86,3 +86,32 @@ without touching seed_data.py at all.
    FastAPI, save it to a temp path, call `count_pdf_pages()`, then
    `calculate_order_price()` — and discard the temp file afterward if you
    want to stay fully write-free.
+
+
+
+
+Terminal 1: MCP server (start this first)
+
+powershell
+cd D:\xerox_shop_assistant
+.venv\Scripts\Activate.ps1
+cd mcp_server
+python server.py
+
+
+
+Terminal 2: backend
+
+powershell
+cd D:\xerox_shop_assistant
+.venv\Scripts\Activate.ps1
+cd backend
+uvicorn main:app --reload --port 8000
+
+cd backend
+$env:ANSWER_CACHE="off"
+uvicorn main:app --reload --port 8000
+
+
+
+start frontend\index.html

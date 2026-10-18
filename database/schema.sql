@@ -46,6 +46,11 @@ CREATE TABLE IF NOT EXISTS holidays (
     description TEXT
 );
 
+-- CREATE TABLE IF NOT EXISTS shop_location (
+--     id          INTEGER PRIMARY KEY AUTOINCREMENT,
+--     description TEXT
+-- );
+
 CREATE TABLE IF NOT EXISTS faq (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     question    TEXT NOT NULL,

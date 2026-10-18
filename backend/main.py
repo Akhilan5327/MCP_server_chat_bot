@@ -49,7 +49,18 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Xerox Shop Assistant", lifespan=lifespan)
 
-limiter = Limiter(key_func=get_remote_address)
+def client_key(request: Request) -> str:
+    """Identify the visitor for rate limiting. Behind Render's proxy the real address
+    arrives in the X-Forwarded-For header; locally we fall back to the socket address."""
+    forwarded = request.headers.get("x-forwarded-for", "")
+    if forwarded:
+        first = forwarded.split(",")[0].strip()
+        if first:
+            return first
+    return get_remote_address(request)
+
+
+limiter = Limiter(key_func=client_key)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 

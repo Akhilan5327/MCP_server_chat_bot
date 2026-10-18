@@ -15,3 +15,7 @@ Thumbs.db
 # Editor/IDE settings (optional, remove if you want to share these)
 .vscode/
 .idea/
+
+
+tests/eval_runs/
+.pytest_cache/
