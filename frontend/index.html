@@ -1,551 +1,462 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Shop Assistant</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TruePrice | Anbhu e-NET Service Bot</title>
+<meta name="description" content="Ask about prices, services, opening hours and the shop address. Answers come from the shop's own price list.">
+<meta name="color-scheme" content="light">
+<link rel="icon" type="image/jpeg" href="data:image/jpeg;base64,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">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Tamil:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #ffffff;
-    --surface: #ffffff;
-    --surface-alt: #fafafa;
-    --ink: #111111;
-    --ink-muted: #8a8a8a;
-    --accent: #111111;
-    --accent-ink: #ffffff;
-    --border: #e8e8e8;
-    --border-soft: #f0f0f0;
-    --error-bg: #fdf2f1;
-    --error-border: #f3d3cf;
-    --error-ink: #b3402f;
-    --radius: 16px;
-    --radius-sm: 10px;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    --ink: #14111f;
+    --muted: #5b5670;
+    --faint: #6b6580;
+    --line: rgba(20, 17, 31, .12);
+    --line-strong: rgba(20, 17, 31, .24);
+    --accent: #5b3df5;
+    --accent-2: #7c5cff;
+    --teal: #0d9488;
+    --pink: #c026d3;
+    --blue: #2563eb;
+    --amber: #d97706;
+    --serif: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --radius-card: 28px;
   }
-
   * { box-sizing: border-box; }
-  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
-  html, body {
-    height: 100%;
-  }
+  html { scroll-behavior: smooth; scroll-padding-top: 110px; }
   body {
     margin: 0;
-    font-family: 'Inter', 'Noto Sans Tamil', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
+    min-height: 100vh;
     color: var(--ink);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-
-  .app {
-    width: 100%;
-    max-width: 480px;
-    height: 100%;
-    max-height: 760px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: 0 1px 1px rgba(0,0,0,0.02), 0 16px 40px rgba(0,0,0,0.06);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  /* ---------- Header ---------- */
-  .header {
-    padding: 18px 20px;
-    padding-top: calc(18px + env(safe-area-inset-top, 0px));
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 1px solid var(--border-soft);
-    flex-shrink: 0;
-  }
-  .mark {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: var(--ink);
-    color: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 13px;
-    flex-shrink: 0;
-    letter-spacing: 0.02em;
-  }
-  .header-text { flex: 1; min-width: 0; }
-  .header-text h1 {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-  }
-  .status {
-    margin: 3px 0 0;
-    font-size: 12.5px;
-    color: var(--ink-muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: #7fb46c;
-    flex-shrink: 0;
-    transition: background 0.3s ease;
-  }
-  .dot.off { background: #d97b6c; }
-  .dot.pending { background: #d9c26c; }
-
-  /* ---------- Messages ---------- */
-  .messages {
-    flex: 1;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scroll-behavior: smooth;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .row { display: flex; animation: rise 0.28s ease both; }
-  .row.user { justify-content: flex-end; }
-  @keyframes rise {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .bubble {
-    max-width: 84%;
-    padding: 10px 14px;
-    border-radius: var(--radius-sm);
-    font-size: 14.5px;
+    font-family: var(--sans);
+    font-size: 16px;
     line-height: 1.55;
-    white-space: pre-wrap;
-    word-wrap: break-word;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(900px 480px at 10% -8%, rgba(124, 92, 255, .07), transparent 60%),
+      repeating-linear-gradient(115deg, rgba(20, 17, 31, .028) 0 1px, transparent 1px 10px);
+    background-attachment: scroll;
+    -webkit-font-smoothing: antialiased;
   }
-  .row.assistant .bubble {
-    background: var(--surface-alt);
-    color: var(--ink);
-    border-bottom-left-radius: 4px;
+  a { color: #0f766e; }
+  button, input, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* ---------- header ---------- */
+  .site-header { position: sticky; top: 14px; z-index: 20; padding: 0 16px; }
+  .nav {
+    max-width: 1180px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 12px 14px 12px 18px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .78);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    transition: background .3s, box-shadow .3s;
   }
-  .row.user .bubble {
-    background: var(--ink);
-    color: var(--bg);
-    border-bottom-right-radius: 4px;
+  .site-header.scrolled .nav { background: rgba(255, 255, 255, .96); box-shadow: 0 10px 30px rgba(20, 17, 31, .08); }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; text-decoration: none; color: inherit; }
+  .brand-logo { flex: none; width: 44px; height: 44px; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); display: block; }
+  .brand-name { font-weight: 600; font-size: 1.15rem; letter-spacing: -.01em; }
+  .brand-sep { width: 1px; height: 22px; background: var(--line-strong); flex: none; }
+  .brand-sub { color: var(--muted); font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pill-btn {
+    flex: none;
+    border: 1px solid var(--line-strong); background: #fff;
+    border-radius: 999px; padding: 9px 18px; cursor: pointer; text-decoration: none; color: var(--ink);
+    font-weight: 500; font-size: .92rem;
+    transition: background .2s, border-color .2s, transform .2s;
   }
-  .row.error .bubble {
-    background: var(--error-bg);
-    border: 1px solid var(--error-border);
-    color: var(--error-ink);
-    border-bottom-left-radius: 4px;
+  .pill-btn:hover { background: rgba(91, 61, 245, .07); border-color: var(--accent); }
+  .pill-btn:active { transform: scale(.97); }
+
+  /* ---------- layout ---------- */
+  main { max-width: 1180px; margin: 0 auto; padding: 0 16px 56px; }
+  .hero { padding: 64px 4px 36px; }
+  .eyebrow {
+    font-family: var(--mono); font-size: .78rem; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 16px;
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(2.6rem, 7vw, 4.6rem); line-height: 1.02; letter-spacing: -.02em;
+    margin: 0 0 18px; max-width: 18ch;
+  }
+  h1 em { font-style: italic; color: var(--accent); }
+  .lead { color: var(--muted); font-size: 1.1rem; max-width: 56ch; margin: 0; }
+
+  .layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .side { display: grid; gap: 24px; position: sticky; top: 100px; }
+
+  .card {
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-card);
+    background: linear-gradient(165deg, #ffffff, #faf9ff 70%);
+    box-shadow: 0 18px 50px rgba(20, 17, 31, .07);
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .card:hover { border-color: rgba(91, 61, 245, .4); box-shadow: 0 22px 60px rgba(91, 61, 245, .10); }
+  .panel { padding: 22px 18px 18px; }
+  .panel-label {
+    font-family: var(--mono); font-size: .72rem; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--faint); margin: 0 6px 14px;
   }
 
-  .typing {
-    display: inline-flex;
-    gap: 4px;
-    padding: 4px 2px;
+  /* quick questions */
+  .quick { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .quick button {
+    width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+    padding: 12px 14px; border-radius: 16px; border: 1px solid transparent; background: transparent; cursor: pointer;
+    color: var(--ink); transition: background .2s, border-color .2s;
   }
-  .typing span {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--ink-muted);
-    animation: bounce 1.2s infinite ease-in-out;
-  }
-  .typing span:nth-child(2) { animation-delay: 0.15s; }
-  .typing span:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
-    30% { transform: translateY(-4px); opacity: 1; }
-  }
+  .quick button:hover { background: rgba(20, 17, 31, .04); border-color: var(--line); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+  .quick .arrow { margin-left: auto; opacity: .4; transition: transform .2s, opacity .2s; }
+  .quick button:hover .arrow { opacity: 1; transform: translate(2px, -2px); }
 
-  .empty {
-    margin: auto;
-    text-align: center;
-    color: var(--ink-muted);
-    font-size: 13.5px;
-    max-width: 280px;
-    line-height: 1.65;
+  /* chat */
+  .chat { display: flex; flex-direction: column; height: min(72vh, 680px); min-height: 460px; overflow: hidden; }
+  .chat-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid var(--line);
   }
-  .empty strong { color: var(--ink); font-weight: 600; }
+  .chat-title { display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: .75rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
+  .live { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 4px rgba(13, 148, 136, .16); }
+  .log { flex: 1; overflow-y: auto; padding: 22px 20px; display: flex; flex-direction: column; gap: 14px; scroll-behavior: smooth; }
+  .log::-webkit-scrollbar { width: 8px; }
+  .log::-webkit-scrollbar-thumb { background: rgba(20, 17, 31, .2); border-radius: 8px; }
+  .msg { max-width: 82%; padding: 12px 16px; border-radius: 20px; white-space: pre-wrap; overflow-wrap: anywhere; animation: pop .25s ease both; }
+  .msg.bot { align-self: flex-start; background: #f5f4fb; border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+  .msg.user { align-self: flex-end; color: #fff; background: linear-gradient(135deg, var(--accent), var(--accent-2)); border-bottom-right-radius: 6px; }
+  .msg.user a { color: #fff; }
+  .msg.error { background: #fef2f2; border-color: rgba(220, 38, 38, .35); color: #991b1b; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+  .typing { display: inline-flex; gap: 5px; padding: 4px 2px; }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: blink 1.2s infinite ease-in-out; }
+  .typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
 
-  /* ---------- Quote panel ---------- */
-  .quote-panel {
-    border-top: 1px solid var(--border-soft);
-    padding: 12px 14px;
-    display: flex;
-    gap: 6px;
-    align-items: center;
-    background: var(--surface-alt);
-    font-size: 13px;
-    flex-wrap: wrap;
-    overflow: hidden;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    border-top-width: 0;
-    transition: max-height 0.25s ease, padding 0.25s ease, border-top-width 0.25s ease;
-  }
-  .quote-panel.open {
-    max-height: 200px;
-    padding: 12px 14px;
-    border-top-width: 1px;
-  }
-  .quote-panel select, .quote-panel input[type="number"] {
-    font-family: inherit;
-    font-size: 13px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 5px 7px;
-    background: var(--surface);
-    color: var(--ink);
-  }
-  .quote-panel input[type="number"] { width: 52px; }
-  .quote-panel input[type="file"] {
-    flex: 1;
-    min-width: 130px;
-    font-size: 12px;
-    color: var(--ink-muted);
-  }
-  .quote-panel button {
-    background: var(--ink);
-    color: var(--bg);
-    border: none;
-    border-radius: 8px;
-    padding: 6px 13px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s ease;
-  }
-  .quote-panel button:hover { opacity: 0.82; }
-  .quote-panel button#qClear {
-    background: transparent;
-    color: var(--ink-muted);
-    border: 1px solid var(--border);
-    padding: 6px 10px;
-  }
-  .quote-panel button#qClear:hover { background: var(--surface); opacity: 1; }
-
-  .file-hint {
-    font-size: 11.5px;
-    color: var(--ink-muted);
-    padding: 0 20px 10px;
-    background: var(--surface-alt);
-  }
-
-  /* ---------- Composer ---------- */
-  .composer {
-    border-top: 1px solid var(--border-soft);
-    padding: 14px;
-    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-    display: flex;
-    gap: 8px;
-    background: var(--surface);
-    flex-shrink: 0;
-  }
-  #attachBtn {
-    background: var(--surface-alt);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 0 13px;
-    cursor: pointer;
-    font-size: 15px;
-    flex-shrink: 0;
-    color: var(--ink-muted);
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  #attachBtn:hover { background: var(--border-soft); color: var(--ink); }
-  #attachBtn.active { color: var(--ink); border-color: var(--ink); }
-
+  .composer { display: flex; gap: 10px; padding: 14px 16px 16px; border-top: 1px solid var(--line); }
   .composer input {
-    flex: 1;
-    min-width: 0;
-    border: 1px solid var(--border);
-    background: var(--surface-alt);
-    border-radius: var(--radius-sm);
-    padding: 11px 14px;
-    font-family: inherit;
-    font-size: 14.5px;
-    color: var(--ink);
-    outline: none;
-    transition: border-color 0.15s ease;
+    flex: 1; min-width: 0; padding: 13px 20px; border-radius: 999px;
+    border: 1px solid var(--line-strong); background: #fff;
   }
-  .composer input:focus { border-color: var(--ink); }
-
-  .composer button#sendBtn {
-    background: var(--ink);
-    color: var(--bg);
-    border: none;
-    border-radius: var(--radius-sm);
-    padding: 0 18px;
-    font-family: inherit;
-    font-size: 14.5px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.15s ease;
+  .composer input::placeholder { color: var(--faint); }
+  .send {
+    flex: none; width: 48px; height: 48px; border-radius: 50%; border: 0;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); cursor: pointer; display: grid; place-items: center;
+    box-shadow: 0 8px 20px rgba(91, 61, 245, .28);
+    transition: transform .2s, opacity .2s;
   }
-  .composer button#sendBtn:hover:not(:disabled) { opacity: 0.82; }
-  .composer button#sendBtn:disabled { opacity: 0.35; cursor: default; }
+  .send:hover { transform: scale(1.06); }
+  .send:disabled { opacity: .45; cursor: not-allowed; transform: none; }
 
-  .messages::-webkit-scrollbar { width: 6px; }
-  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
-  .messages::-webkit-scrollbar-track { background: transparent; }
-
-  /* ---------- Responsive ---------- */
-  @media (max-width: 600px) {
-    body { padding: 0; align-items: stretch; }
-    .app {
-      max-width: 100%;
-      max-height: none;
-      height: 100%;
-      border-radius: 0;
-      border: none;
-      box-shadow: none;
-    }
+  /* quote */
+  .quote form { display: grid; gap: 12px; }
+  .quote label { display: grid; gap: 6px; font-size: .85rem; color: var(--muted); }
+  .quote input[type="file"], .quote select, .quote input[type="number"] {
+    width: 100%; padding: 10px 14px; border-radius: 14px; border: 1px solid var(--line-strong); background: #fff;
   }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .quote .go { justify-self: start; }
+  .quote-out { margin-top: 14px; font-size: .95rem; }
+  .quote-out dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; }
+  .quote-out dt { color: var(--muted); } .quote-out dd { margin: 0; text-align: right; }
+  .quote-out .total { font-weight: 600; font-size: 1.1rem; border-top: 1px solid var(--line); padding-top: 8px; margin-top: 4px; color: var(--ink); }
+  .quote-out .err { color: #b91c1c; }
 
+  .note { margin: 28px 6px 0; color: var(--faint); font-size: .85rem; font-family: var(--mono); letter-spacing: .02em; }
+
+  /* reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .side { position: static; order: 2; }
+    .chat { order: 1; }
+    .brand-sub { display: none; }
+    .brand-sep { display: none; }
+    .hero { padding-top: 40px; }
+    .row2 { grid-template-columns: 1fr; }
+    .msg { max-width: 92%; }
+  }
   @media (prefers-reduced-motion: reduce) {
-    .row { animation: none; }
-    .messages { scroll-behavior: auto; }
-    * { transition: none !important; }
+    html, .log { scroll-behavior: auto; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .msg, .typing i { animation: none; }
   }
 </style>
 </head>
 <body>
 
-<div class="app">
-  <div class="header">
-    <div class="mark">S</div>
-    <div class="header-text">
-      <h1>Shop Assistant</h1>
-      <p class="status" id="status"><span class="dot pending" id="statusDot"></span><span id="statusText">Connecting…</span></p>
-    </div>
+<header class="site-header" id="siteHeader">
+  <div class="nav">
+    <a class="brand" href="#top" aria-label="TruePrice, Anbhu e-NET Service Bot">
+      <img class="brand-logo" src="data:image/jpeg;base64,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" width="44" height="44" alt="Anbhu Enterprises logo">
+      <span class="brand-name">TruePrice</span>
+      <span class="brand-sep" aria-hidden="true"></span>
+      <span class="brand-sub">Anbhu e-NET Service Bot</span>
+    </a>
+    <a class="pill-btn" href="#quote">PDF quote</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero reveal">
+    <p class="eyebrow">$ trueprice --ask-the-shop</p>
+    <h1>Know the <em>real price</em> before you visit.</h1>
+    <p class="lead">Prices, services and opening hours for Anbhu e-NET Service, answered straight from the shop's own price list.</p>
+  </section>
+
+  <div class="layout">
+    <aside class="side">
+      <section class="card panel reveal" aria-labelledby="quickLabel">
+        <p class="panel-label" id="quickLabel">Quick questions</p>
+        <ul class="quick" id="quick"></ul>
+      </section>
+
+      <section class="card panel quote reveal" id="quote" aria-labelledby="quoteLabel">
+        <p class="panel-label" id="quoteLabel">Price a PDF</p>
+        <form id="quoteForm">
+          <label>PDF file
+            <input type="file" id="pdfFile" accept="application/pdf,.pdf" required>
+          </label>
+          <div class="row2">
+            <label>Colour
+              <select id="colorMode"><option value="bw">B &amp; W</option><option value="color">Colour</option></select>
+            </label>
+            <label>Paper
+              <select id="paperSize"><option>A4</option><option>A3</option></select>
+            </label>
+            <label>Copies
+              <input type="number" id="copies" min="1" max="500" value="1">
+            </label>
+          </div>
+          <button class="pill-btn go" type="submit" id="quoteBtn">Get quote</button>
+        </form>
+        <div class="quote-out" id="quoteOut" aria-live="polite"></div>
+      </section>
+    </aside>
+
+    <section class="card chat reveal" aria-label="Chat with the shop assistant">
+      <div class="chat-head">
+        <div class="chat-title"><span class="live" aria-hidden="true"></span>Assistant</div>
+        <button class="pill-btn" type="button" id="newChat">New chat</button>
+      </div>
+      <div class="log" id="log" role="log" aria-live="polite"></div>
+      <form class="composer" id="composer" autocomplete="off">
+        <input id="input" type="text" maxlength="500" placeholder="Ask about a price, a service or opening hours" aria-label="Your message" required>
+        <button class="send" id="send" type="submit" aria-label="Send message">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+    </section>
   </div>
 
-  <div class="messages" id="messages">
-    <div class="empty" id="emptyState">
-      Ask about <strong>prices</strong>, <strong>shop hours</strong>, or services like <strong>Aadhar</strong>, <strong>PAN card</strong>, or <strong>printing</strong>. Or tap 📎 to upload a PDF for an instant quote.
-    </div>
-  </div>
-
-  <div class="quote-panel" id="quotePanel">
-    <input type="file" id="pdfFile" accept="application/pdf" />
-    <select id="qService">
-      <option value="Print">Print</option>
-      <option value="Photocopy">Photocopy</option>
-    </select>
-    <select id="qColor">
-      <option value="bw">B/W</option>
-      <option value="color">Color</option>
-    </select>
-    <input type="number" id="qCopies" min="1" value="1" title="Copies" />
-    <button id="qSubmit" type="button">Get Quote</button>
-    <button id="qClear" type="button" title="Remove file">✕</button>
-  </div>
-  <div class="file-hint" id="fileHint" style="display:none;"></div>
-
-  <div class="composer">
-    <button id="attachBtn" type="button" title="Quote a PDF">📎</button>
-    <input type="text" id="input" placeholder="Ask something…" autocomplete="off" />
-    <button id="sendBtn">Send</button>
-  </div>
-</div>
+  <p class="note">Prices come from the shop's price list. For anything not listed, please contact or visit the shop.</p>
+</main>
 
 <script>
-  // Fixed API base: this page is always served by the same backend it talks
-  // to (FastAPI serves this file directly via GET /), so the API lives at
-  // the same origin the page was loaded from. No user-editable field needed
-  // or wanted here - mistyping it would silently break the chat with no
-  // clear explanation, so it's simpler and safer to just derive it.
-  //
-  // Exception: opening this file directly from disk (file://) for local
-  // testing, where there's no "origin" to derive from - falls back to the
-  // local dev server address in that case.
-  const API_BASE = (location.protocol === 'file:')
-    ? 'http://localhost:8000'
-    : location.origin;
+(function () {
+  "use strict";
 
-  const messagesEl = document.getElementById('messages');
-  const emptyState = document.getElementById('emptyState');
-  const inputEl = document.getElementById('input');
-  const sendBtn = document.getElementById('sendBtn');
-  const statusDot = document.getElementById('statusDot');
-  const statusText = document.getElementById('statusText');
+  var API = "http://localhost:8000";  
 
-  const attachBtn = document.getElementById('attachBtn');
-  const quotePanel = document.getElementById('quotePanel');
-  const pdfFile = document.getElementById('pdfFile');
-  const qService = document.getElementById('qService');
-  const qColor = document.getElementById('qColor');
-  const qCopies = document.getElementById('qCopies');
-  const qSubmit = document.getElementById('qSubmit');
-  const qClear = document.getElementById('qClear');
-  const fileHint = document.getElementById('fileHint');
+  var log = document.getElementById("log");
+  var form = document.getElementById("composer");
+  var input = document.getElementById("input");
+  var sendBtn = document.getElementById("send");
+  var busy = false;
 
-  const sessionId = 'ui-' + Math.random().toString(36).slice(2, 10);
-  let busy = false;
+  /* Hook for human verification (Turnstile) later: return headers to attach to every request. */
+  function getAuthHeaders() { return {}; }
 
-  function addMessage(role, text) {
-    if (emptyState) emptyState.remove();
-    const row = document.createElement('div');
-    row.className = 'row ' + role;
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = text;
-    row.appendChild(bubble);
-    messagesEl.appendChild(row);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-    return bubble;
+  /* ---- session ---- */
+  function newId() {
+    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+      : String(Date.now()) + Math.random().toString(16).slice(2);
+  }
+  var sessionId = null;
+  try { sessionId = sessionStorage.getItem("tp_sid"); } catch (e) {}
+  if (!sessionId) {
+    sessionId = newId();
+    try { sessionStorage.setItem("tp_sid", sessionId); } catch (e) {}
   }
 
-  function addTyping() {
-    const row = document.createElement('div');
-    row.className = 'row assistant';
-    row.id = 'typingRow';
-    row.innerHTML = '<div class="bubble"><span class="typing"><span></span><span></span><span></span></span></div>';
-    messagesEl.appendChild(row);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  function removeTyping() {
-    const row = document.getElementById('typingRow');
-    if (row) row.remove();
-  }
-
-  function updateFileHint() {
-    if (pdfFile.files.length) {
-      fileHint.style.display = 'block';
-      fileHint.textContent = 'Using: ' + pdfFile.files[0].name + ' — change options above and click Get Quote again to re-quote the same file.';
-    } else {
-      fileHint.style.display = 'none';
-      fileHint.textContent = '';
-    }
-  }
-
-  async function checkHealth() {
-    try {
-      const res = await fetch(API_BASE + '/health');
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      statusDot.className = 'dot';
-      statusText.textContent = data.tools_loaded + ' tools ready';
-    } catch {
-      statusDot.className = 'dot off';
-      statusText.textContent = 'Offline — try again shortly';
-    }
-  }
-
-  async function sendMessage() {
-    const text = inputEl.value.trim();
-    if (!text || busy) return;
-    busy = true;
-    sendBtn.disabled = true;
-    inputEl.value = '';
-    addMessage('user', text);
-    addTyping();
-
-    try {
-      const res = await fetch(API_BASE + '/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, session_id: sessionId }),
-      });
-      removeTyping();
-      if (!res.ok) throw new Error('Server returned ' + res.status);
-      const data = await res.json();
-      addMessage('assistant', data.reply || '(empty reply)');
-    } catch (err) {
-      removeTyping();
-      addMessage('error', "Couldn't reach the shop assistant. Please try again in a moment.");
-    } finally {
-      busy = false;
-      sendBtn.disabled = false;
-      inputEl.focus();
-    }
-  }
-
-  sendBtn.addEventListener('click', sendMessage);
-  inputEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') sendMessage();
-  });
-
-  attachBtn.addEventListener('click', () => {
-    const willOpen = !quotePanel.classList.contains('open');
-    quotePanel.classList.toggle('open', willOpen);
-    attachBtn.classList.toggle('active', willOpen);
-  });
-
-  pdfFile.addEventListener('change', updateFileHint);
-
-  qClear.addEventListener('click', () => {
-    pdfFile.value = '';
-    updateFileHint();
-    quotePanel.classList.remove('open');
-    attachBtn.classList.remove('active');
-  });
-
-  qSubmit.addEventListener('click', async () => {
-    if (busy) return;
-    if (!pdfFile.files.length) {
-      addMessage('error', 'Choose a PDF file first.');
-      return;
-    }
-    const chosenFile = pdfFile.files[0];
-    const MAX_SIZE_MB = 20;
-    if (chosenFile.size > MAX_SIZE_MB * 1024 * 1024) {
-      addMessage('error', `That file is ${(chosenFile.size / (1024*1024)).toFixed(1)} MB — please upload a PDF under ${MAX_SIZE_MB} MB.`);
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', chosenFile);
-    formData.append('service_name', qService.value);
-    formData.append('color_mode', qColor.value);
-    formData.append('copies', qCopies.value);
-
-    busy = true;
-    qSubmit.disabled = true;
-    addMessage('user', `Quote request: ${chosenFile.name} (${qService.value}, ${qColor.value === 'bw' ? 'B/W' : 'Color'}, x${qCopies.value})`);
-    addTyping();
-
-    try {
-      const res = await fetch(API_BASE + '/upload-quote', { method: 'POST', body: formData });
-      removeTyping();
-      if (!res.ok) throw new Error('Server returned ' + res.status);
-      const data = await res.json();
-      if (data.error) {
-        addMessage('error', data.error);
+  /* ---- rendering ---- */
+  function renderText(el, text) {
+    text.split(/(https?:\/\/[^\s]+)/g).forEach(function (part) {
+      var m = part.match(/^(https?:\/\/.*?)([.,;:!?)]*)$/);
+      if (m) {
+        var a = document.createElement("a");
+        a.href = m[1]; a.textContent = m[1]; a.target = "_blank"; a.rel = "noopener noreferrer";
+        el.appendChild(a);
+        if (m[2]) el.appendChild(document.createTextNode(m[2]));
       } else {
-        const q = data.quote;
-        let text = `${data.page_count} page(s) x ${qCopies.value} copies = ${q.total_pages} total pages.\n`;
-        text += `Rate: INR ${q.price_per_page}/page.\n`;
-        if (q.discount_pct > 0) {
-          text += `Bulk discount: ${q.discount_pct}% (-INR ${q.discount_amount})\n`;
-        }
-        text += `Total: INR ${q.total}\n\nWant it in ${qColor.value === 'bw' ? 'color' : 'B/W'} instead? Just switch the option above and click Get Quote again — no need to re-upload.`;
-        addMessage('assistant', text);
+        el.appendChild(document.createTextNode(part));
       }
-    } catch (err) {
-      removeTyping();
-      addMessage('error', "Couldn't reach the server for the quote.");
+    });
+  }
+  function scrollLog() { log.scrollTo({ top: log.scrollHeight, behavior: "smooth" }); }
+  function addMessage(role, text, isError) {
+    var div = document.createElement("div");
+    div.className = "msg " + role + (isError ? " error" : "");
+    renderText(div, text);
+    log.appendChild(div);
+    scrollLog();
+    return div;
+  }
+  function addTyping() {
+    var div = document.createElement("div");
+    div.className = "msg bot";
+    div.innerHTML = '<span class="typing" aria-label="Assistant is typing"><i></i><i></i><i></i></span>';
+    log.appendChild(div);
+    scrollLog();
+    return div;
+  }
+  function welcome() {
+    addMessage("bot", "Hi! I can help with prices, services, opening hours and the shop address. What would you like to know?");
+  }
+
+  /* ---- chat ---- */
+  async function ask(text) {
+    text = (text || "").trim();
+    if (!text || busy) return;
+    busy = true; sendBtn.disabled = true;
+    addMessage("user", text);
+    input.value = "";
+    var typing = addTyping();
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 60000);
+    try {
+      var res = await fetch(API + "/chat", {
+        method: "POST",
+        headers: Object.assign({ "Content-Type": "application/json" }, getAuthHeaders()),
+        body: JSON.stringify({ message: text, session_id: sessionId }),
+        signal: ctrl.signal
+      });
+      typing.remove();
+      if (res.status === 429) {
+        addMessage("bot", "You are sending messages too quickly. Please wait a minute and try again.", true);
+      } else if (!res.ok) {
+        addMessage("bot", "Sorry, something went wrong. Please call or visit the shop directly for help.", true);
+      } else {
+        var data = await res.json();
+        addMessage("bot", data.reply || "Sorry, I could not find an answer. Please contact or visit the shop.");
+      }
+    } catch (e) {
+      typing.remove();
+      addMessage("bot", "I could not reach the server. Please check your connection or call the shop directly.", true);
     } finally {
-      busy = false;
-      qSubmit.disabled = false;
+      clearTimeout(timer);
+      busy = false; sendBtn.disabled = false; input.focus();
+    }
+  }
+  form.addEventListener("submit", function (e) { e.preventDefault(); ask(input.value); });
+
+  document.getElementById("newChat").addEventListener("click", function () {
+    sessionId = newId();
+    try { sessionStorage.setItem("tp_sid", sessionId); } catch (e) {}
+    log.innerHTML = "";
+    welcome();
+    input.focus();
+  });
+
+  /* ---- quick questions ---- */
+  var QUICK = [
+    { color: "var(--teal)",  label: "PAN card new price",           q: "pan card new price" },
+    { color: "var(--teal)",  label: "Aadhar name change price",     q: "aadhar name change price" },
+    { color: "var(--teal)",  label: "Passport new application",     q: "passport new application price" },
+    { color: "var(--pink)",  label: "Print 20 pages, black and white", q: "20 pages black and white print price" },
+    { color: "var(--blue)",  label: "Is the shop open now?",        q: "is the shop open now" },
+    { color: "var(--amber)", label: "Address and phone number",     q: "shop address and contact number" }
+  ];
+  var quick = document.getElementById("quick");
+  QUICK.forEach(function (item) {
+    var li = document.createElement("li");
+    var b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = '<span class="dot" style="background:' + item.color + '"></span><span></span>' +
+      '<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>';
+    b.children[1].textContent = item.label;
+    b.addEventListener("click", function () {
+      document.querySelector(".chat").scrollIntoView({ behavior: "smooth", block: "center" });
+      ask(item.q);
+    });
+    li.appendChild(b);
+    quick.appendChild(li);
+  });
+
+  /* ---- PDF quote ---- */
+  function inr(n) { return "INR " + Number(n).toLocaleString("en-IN", { maximumFractionDigits: 2 }); }
+  var quoteForm = document.getElementById("quoteForm");
+  var quoteOut = document.getElementById("quoteOut");
+  quoteForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var file = document.getElementById("pdfFile").files[0];
+    if (!file) { quoteOut.innerHTML = '<p class="err">Please choose a PDF file.</p>'; return; }
+    var btn = document.getElementById("quoteBtn");
+    btn.disabled = true; btn.textContent = "Calculating...";
+    quoteOut.textContent = "";
+    var fd = new FormData();
+    fd.append("file", file);
+    fd.append("service_name", "Print");
+    fd.append("color_mode", document.getElementById("colorMode").value);
+    fd.append("paper_size", document.getElementById("paperSize").value);
+    fd.append("copies", document.getElementById("copies").value || "1");
+    try {
+      var res = await fetch(API + "/upload-quote", { method: "POST", body: fd, headers: getAuthHeaders() });
+      if (res.status === 429) throw new Error("You are sending requests too quickly. Please wait a minute.");
+      var data = await res.json();
+      if (data.error) throw new Error(data.error);
+      var q = data.quote || {};
+      if (q.found === false) throw new Error(q.error || "Could not work out a price for this file. Please contact the shop.");
+      var rows = [["Pages", data.page_count], ["Copies", q.copies], ["Price per page", inr(q.price_per_page)], ["Subtotal", inr(q.base_cost)]];
+      if (q.discount_amount > 0) rows.push(["Discount", "- " + inr(q.discount_amount)]);
+      var dl = document.createElement("dl");
+      rows.forEach(function (r) {
+        var dt = document.createElement("dt"); dt.textContent = r[0];
+        var dd = document.createElement("dd"); dd.textContent = r[1];
+        dl.appendChild(dt); dl.appendChild(dd);
+      });
+      var tt = document.createElement("dt"); tt.className = "total"; tt.textContent = "Total";
+      var td = document.createElement("dd"); td.className = "total"; td.textContent = inr(q.total);
+      dl.appendChild(tt); dl.appendChild(td);
+      quoteOut.textContent = ""; quoteOut.appendChild(dl);
+    } catch (err) {
+      var p = document.createElement("p"); p.className = "err"; p.textContent = err.message || "Something went wrong.";
+      quoteOut.textContent = ""; quoteOut.appendChild(p);
+    } finally {
+      btn.disabled = false; btn.textContent = "Get quote";
     }
   });
 
-  checkHealth();
-  inputEl.focus();
-</script>
+  /* ---- header shadow and reveal on scroll ---- */
+  var header = document.getElementById("siteHeader");
+  function onScroll() { header.classList.toggle("scrolled", window.scrollY > 10); }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 
+  var reveals = document.querySelectorAll(".reveal");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { threshold: 0.08 });
+    reveals.forEach(function (el, i) { el.style.transitionDelay = (i * 70) + "ms"; io.observe(el); });
+  } else {
+    reveals.forEach(function (el) { el.classList.add("in"); });
+  }
+
+  welcome();
+})();
+</script>
 </body>
 </html>
