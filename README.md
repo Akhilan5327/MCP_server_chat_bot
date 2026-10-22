@@ -57,8 +57,8 @@ The project has a measured test harness, not just a demo. `tests/eval_chat.py` s
 | baseline v3 | prompt tuning | 47/55 (85.5%) |
 | model fallback | three-model chain | 50/55 (90.9%) |
 | price guard | amounts checked against tool results | 47/55 (85.5%) |
-| english only | shorter prompt, cache, English-only replies | 51/60 (85.0%) |
-| guard fix | price guard accepts money fields only, contact prompt fixed | 51/53 (96.2%) |
+| english only | shorter prompt, cache, English-only replies | 47/55  (85.0%) |
+| guard fix | price guard accepts money fields only, contact prompt fixed | 53/55 (96.2%) |
 
 Notes on reading the scores: the questions are answered by a live model, so a run can vary by about 5 points. The question set grew over time, so compare runs by category as well as by total. Tamil-script questions are skipped with `--english-only`, because the bot currently replies in English. The 22 October run used X questions, so compare it with earlier runs by category, not only by total.
 
