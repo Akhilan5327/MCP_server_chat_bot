@@ -37,7 +37,7 @@ The language model never touches the database. It can only call a small set of *
 | Feature | What it does |
 |---|---|
 | **Read-only database** | The app never writes to SQLite. A test checks that every SQL statement in the code is a `SELECT`. |
-| **Price guard** (`backend/guards.py`) | Every amount in a reply (INR, Rs, rupee sign) must appear in a tool result from the same conversation. Otherwise the reply is replaced with "Sorry, I could not confirm that price. Please contact or visit the shop for the exact charge." |
+| **Price guard** (`backend/guards.py`) | Every amount in a reply (INR, Rs, rupee sign) must appear in a money field (price, total, price per page and so on) of a tool result from the same conversation. Page counts, copies and discount percentages never count as prices. Otherwise the reply is replaced with "Sorry, I could not confirm that price. Please contact or visit the shop for the exact charge." |
 | **Model fallback** (`backend/llm_router.py`) | An ordered list of models. If one is rate-limited or fails, the next one answers in about a second. A failing model is skipped for a cool-down period. Hard questions go to the larger model first. |
 | **Answer cache** (`backend/cache.py`) | Repeated first questions are answered from memory with no model call. The cache clears itself when `shop.db` changes, entries expire after 2 hours, and answers that depend on the time (open now, hours) or that failed are never cached. |
 | **Forgiving name matching** | "pancard", "aadhaar", "voterid", "tirupathi dharshan" and similar spellings still find the right service. |
@@ -57,15 +57,15 @@ The project has a measured test harness, not just a demo. `tests/eval_chat.py` s
 | baseline v3 | prompt tuning | 47/55 (85.5%) |
 | model fallback | three-model chain | 50/55 (90.9%) |
 | price guard | amounts checked against tool results | 47/55 (85.5%) |
-| english only | shorter prompt, cache, English-only replies | 51/60   85.0%|
+| english only | shorter prompt, cache, English-only replies | 51/60 (85.0%) |
+| guard fix | price guard accepts money fields only, contact prompt fixed | X/Y (96.2%) |
 
-Notes on reading the scores: the questions are answered by a live model, so a run can vary by about 5 points. The question set grew over time, so compare runs by category as well as by total. Tamil-script questions are skipped with `--english-only`, because the bot currently replies in English.
+Notes on reading the scores: the questions are answered by a live model, so a run can vary by about 5 points. The question set grew over time, so compare runs by category as well as by total. Tamil-script questions are skipped with `--english-only`, because the bot currently replies in English. The 22 October run used X questions, so compare it with earlier runs by category, not only by total.
 
 Other measurements:
 
 - **Prompt size:** about 2,200 tokens per call before optimisation, about 1,390 after (shorter prompt, shorter tool descriptions, unused tool hidden from the model).
-- **Automated tests:** 78 tests (`python -m pytest tests -v`) covering prices, name matching, contact-only services, print quote maths, bulk discounts, opening hours and holidays, the read-only check, the price guard, the model router and the cache.
-
+- **Automated tests:** 83 tests (`python -m pytest tests -v`) covering prices, name matching, contact-only services, print quote maths, bulk discounts, opening hours and holidays, the read-only check, the price guard, the model router and the cache.
 
 ## Tech stack
 
@@ -152,6 +152,8 @@ python tests\load_test.py --users 10
 
 All data lives in `database/seed_data.py`. A service with rows in `service_pricing` has fixed prices. A service without any is answered with "contact or visit the shop". Per-page services use the `pricing` table. After editing, rebuild `shop.db` as in step 3 above and restart the servers. The answer cache clears by itself when the database file changes.
 
+If you add a new price field to a tool result (for example `fee` or `deposit`), add its name to `MONEY_KEYS` in `backend/guards.py`. Otherwise the price guard will block replies that quote it.
+
 ## Deploy on Render
 
 `start.sh` starts both the MCP server and the backend. Set `GROQ_API_KEY` as an environment variable in the Render dashboard. `database/shop.db` is part of the repository, so commit it after rebuilding. The free tier sleeps after about 15 minutes without traffic, so a free uptime pinger on `/health` keeps it awake.
@@ -163,14 +165,12 @@ All data lives in `database/seed_data.py`. A service with rows in `service_prici
 - CORS is currently open (`*`) and should be restricted to the shop's website before wider use.
 - The Groq free tier has per-minute token limits. The cache and the fallback chain reduce the effect, but a sudden crowd can still be slowed down.
 - The rate limit trusts the visitor address sent by the proxy, so a determined person could get around it.
+- The price guard checks that an amount exists in a money field of a tool result. It does not check that the amount belongs to the service the customer asked about.
 
 ## Possible next steps
 
-Restrict CORS, add Cloudflare Turnstile, add a "documents to bring" FAQ for each service, add a daily summary of unanswered questions for the shop owner, and add CI that runs the tests on every push.
+Restrict CORS, add Cloudflare Turnstile, add a "documents to bring" FAQ for each service, add a daily summary of unanswered questions for the shop owner, match each quoted price to its own service in the price guard, and add CI that runs the tests on every push.
 
 ## License
 
 MIT. See the [LICENSE](LICENSE) file.
-
-
-
