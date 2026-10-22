@@ -65,7 +65,7 @@ Other measurements:
 
 - **Prompt size:** about 2,200 tokens per call before optimisation, about 1,390 after (shorter prompt, shorter tool descriptions, unused tool hidden from the model).
 - **Automated tests:** 78 tests (`python -m pytest tests -v`) covering prices, name matching, contact-only services, print quote maths, bulk discounts, opening hours and holidays, the read-only check, the price guard, the model router and the cache.
-- **Load test:** 10 simultaneous users, `<fill in: success rate, median and slowest reply time from python tests\load_test.py --users 10>`.
+
 
 ## Tech stack
 
@@ -174,28 +174,3 @@ MIT. See the [LICENSE](LICENSE) file.
 
 
 
-Terminal 1: MCP server (start this first)
-
-powershell
-cd D:\xerox_shop_assistant
-.venv\Scripts\Activate.ps1
-cd mcp_server
-python server.py
-
-
-
-Terminal 2: backend
-
-powershell
-cd D:\xerox_shop_assistant
-.venv\Scripts\Activate.ps1
-cd backend
-uvicorn main:app --reload --port 8000
-
-cd backend
-$env:ANSWER_CACHE="off"
-uvicorn main:app --reload --port 8000
-
-
-
-start frontend\index.html
